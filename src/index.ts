@@ -1,10 +1,11 @@
-import { execSync } from 'child_process';
-import commandExists from 'command-exists';
+
+import { CommandWrapper } from './CommandWrapper';
+import { ICommandWrapper } from './ICommandWrapper';
 const command = 'wget';
 const fileId = process.argv[2];
 const fileName = process.argv[3];
-(() => {
-    if (!commandExists.sync('wget')) {
+((commandWrapper: ICommandWrapper) => {
+    if (!commandWrapper.hasCommand('wget')) {
         console.error('wget not found');
         return;
     }
@@ -13,11 +14,5 @@ const fileName = process.argv[3];
         return;
     }
     console.log(`Downloading ${fileId}, saving to ${fileName}`);
-    try {
-        execSync(`${command} --no-check-certificate 'https://docs.google.com/uc?export=download&id=${fileId}' -O ${fileName}`, {
-            stdio: 'inherit'
-        });
-    } catch(_) {
-        
-    }
-})();
+    commandWrapper.executeCommand(`${command} --no-check-certificate 'https://docs.google.com/uc?export=download&id=${fileId}' -O ${fileName}`, {outputToCLI: true});
+})(new CommandWrapper());
