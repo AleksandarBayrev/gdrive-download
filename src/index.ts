@@ -1,11 +1,10 @@
 import { execSync } from 'child_process';
+import commandExists from 'command-exists';
 const command = 'wget';
-const fileId = process.argv[3];
-const fileName = process.argv[4];
+const fileId = process.argv[2];
+const fileName = process.argv[3];
 (() => {
-    try {
-        execSync(`${command}`, {stdio: 'ignore'});
-    } catch (err) {
+    if (!commandExists.sync('wget')) {
         console.error('wget not found');
         return;
     }
@@ -13,7 +12,12 @@ const fileName = process.argv[4];
         console.error('Command syntax: node gdrive-download.js FILE_ID OUTPUT_FILE_NAME');
         return;
     }
-    execSync(`${command} --no-check-certificate 'https://docs.google.com/uc?export=download&id=${fileId}' -O ${fileName}`, {
-        stdio: 'inherit'
-    });
+    console.log(`Downloading ${fileId}, saving to ${fileName}`);
+    try {
+        execSync(`${command} --no-check-certificate 'https://docs.google.com/uc?export=download&id=${fileId}' -O ${fileName}`, {
+            stdio: 'inherit'
+        });
+    } catch(_) {
+        
+    }
 })();
